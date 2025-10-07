@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>PTCG Meta Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 24px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+    h2 { margin-top: 32px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>Pokémon TCG Meta (last 60 days)</h1>
+  <div class="grid">
+    <canvas id="archetypeShare"></canvas>
+    <canvas id="topCards"></canvas>
+  </div>
+
+  <h2>Archetypes</h2>
+  <table id="archetypeTable">
+    <thead>
+      <tr><th>Archetype</th><th>Decks</th><th>Win rate</th><th>Top cuts</th><th>Events</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Best cards (min appearances)</h2>
+  <table id="cardTable">
+    <thead>
+      <tr><th>Card</th><th>Appearances</th><th>Cut rate</th><th>Avg win</th><th>Score</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function loadJSON(path) {
+      const res = await fetch(path);
+      return res.json();
+    }
+    (async () => {
+      const archetypes = await loadJSON("../data/archetypes.json");
+      const cards = await loadJSON("../data/cards.json");
+
+      // Archetype table
+      const tbodyA = document.querySelector("#archetypeTable tbody");
+      archetypes.sort((a,b)=>b.decks - a.decks).forEach(a => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${a.archetype}</td>
+          <td>${a.decks}</td>
+          <td>${a.winRate != null ? (a.winRate*100).toFixed(1) + "%" : "-"}</td>
+          <td>${a.topCuts}</td>
+          <td>${a.eventCount}</td>`;
+        tbodyA.appendChild(tr);
+      });
+
+      // Card table
+      const tbodyC = document.querySelector("#cardTable tbody");
+      cards.forEach(c => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${c.card}</td>
+          <td>${c.appearances}</td>
+          <td>${(c.cutRate*100).toFixed(1)}%</td>
+          <td>${c.avgWin != null ? (c.avgWin*100).toFixed(1) + "%" : "-"}</td>
+          <td>${c.score.toFixed(3)}</td>`;
+        tbodyC.appendChild(tr);
+      });
+
+      // Charts
+      const ctxA = document.getElementById("archetypeShare");
+      new Chart(ctxA, {
+        type: "bar",
+        data: {
+          labels: archetypes.map(a => a.archetype),
+          datasets: [{
+            label: "Decks",
+            data: archetypes.map(a => a.decks),
+            backgroundColor: "#3b82f6"
+          }]
+        },
+        options: { responsive: true }
+      });
+
+      const ctxC = document.getElementById("topCards");
+      new Chart(ctxC, {
+        type: "bar",
+        data: {
+          labels: cards.slice(0, 20).map(c => c.card),
+          datasets: [{
+            label: "Score",
+            data: cards.slice(0, 20).map(c => c.score),
+            backgroundColor: "#ef4444"
+          }]
+        },
+        options: { responsive: true }
+      });
+    })();
+  </script>
+</body>
+</html>
