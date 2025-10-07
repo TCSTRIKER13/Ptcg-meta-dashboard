@@ -1,0 +1,13 @@
+{
+  "name": "ptcg-meta-dashboard",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "update": "node src/update.js",
+    "build": "node src/build.js"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "chart.js": "^4.4.1"
+  }
+}
