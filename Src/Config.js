@@ -1,13 +1,10 @@
 export const CONFIG = {
-  // Fill these with endpoint paths from the Limitless developer docs
-  // (placings, decklists, matches). You’ll just copy URLs from the docs.
-  baseUrl: "https://api.limitlesstcg.com", // example; confirm actual base from docs
+  baseUrl: "https://<your-username>.github.io/pokemon-tcg-api/data",
   endpoints: {
-    tournaments: "/vX/tournaments",      // replace with real path
-    decklists: "/vX/decklists",          // replace with real path
-    matches: "/vX/matches"               // replace with real path
+    tournaments: "/tournaments.json",
+    decklists: "/decklists.json",
+    matches: "/matches.json"
   },
-  // Filters
   format: "Standard",
   lookbackDays: 60,
   minCardAppearances: 15
